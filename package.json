@@ -4,7 +4,8 @@
   "description": "Photon token of Photochain platform",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "compile": "truffle compile",
+    "test": "ts-node $(npm bin)/truffle test"
   },
   "repository": {
     "type": "git",
@@ -26,6 +27,8 @@
   },
   "homepage": "https://github.com/photochain/photon-token#readme",
   "devDependencies": {
-    "truffle": "^4.1.5"
+    "truffle": "^4.1.5",
+    "ts-node": "^5.0.1",
+    "typescript": "^2.8.1"
   }
 }
