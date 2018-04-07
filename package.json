@@ -1,42 +1,44 @@
 {
-  "name": "photon-token",
-  "version": "1.0.0",
-  "description": "Photon token of Photochain platform",
-  "main": "index.js",
-  "scripts": {
-    "compile": "truffle compile",
-    "test": "ts-node $(npm bin)/truffle test",
-    "lint": "run-p -c --aggregate-output lint:solium",
-    "lint:solium": "solium -d contracts"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/photochain/photon-token.git"
-  },
-  "keywords": [
-    "photochain",
-    "erc20",
-    "token",
-    "ethereum"
-  ],
-  "author": {
-    "name": "Jakub Stefanski",
-    "url": "https://jakubstefanski.com"
-  },
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/photochain/photon-token/issues"
-  },
-  "homepage": "https://github.com/photochain/photon-token#readme",
-  "devDependencies": {
-    "@types/chai": "^4.1.2",
-    "@types/mocha": "^5.0.0",
-    "@types/node": "^9.6.2",
-    "bignumber.js": "^6.0.0",
-    "npm-run-all": "^4.1.2",
-    "solium": "^1.1.6",
-    "truffle": "^4.1.5",
-    "ts-node": "^5.0.1",
-    "typescript": "^2.8.1"
-  }
+    "name": "photon-token",
+    "version": "1.0.0",
+    "description": "Photon token of Photochain platform",
+    "main": "index.js",
+    "scripts": {
+        "compile": "truffle compile",
+        "test": "ts-node $(npm bin)/truffle test",
+        "lint": "run-p -c --aggregate-output lint:solium lint:tslint",
+        "lint:tslint": "tslint --project .",
+        "lint:solium": "solium -d contracts"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/photochain/photon-token.git"
+    },
+    "keywords": [
+        "photochain",
+        "erc20",
+        "token",
+        "ethereum"
+    ],
+    "author": {
+        "name": "Jakub Stefanski",
+        "url": "https://jakubstefanski.com"
+    },
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/photochain/photon-token/issues"
+    },
+    "homepage": "https://github.com/photochain/photon-token#readme",
+    "devDependencies": {
+        "@types/chai": "^4.1.2",
+        "@types/mocha": "^5.0.0",
+        "@types/node": "^9.6.2",
+        "bignumber.js": "^6.0.0",
+        "npm-run-all": "^4.1.2",
+        "solium": "^1.1.6",
+        "truffle": "^4.1.5",
+        "ts-node": "^5.0.1",
+        "tslint": "^5.9.1",
+        "typescript": "^2.8.1"
+    }
 }
