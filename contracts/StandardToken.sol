@@ -13,9 +13,9 @@ import "./SafeMath.sol";
 contract StandardToken is ERC20 {
     using SafeMath for uint256;
 
-    mapping(address => uint256) private _balanceOf;
-    mapping (address => mapping (address => uint256)) private _allowance;
-    uint256 private _totalSupply;
+    mapping(address => uint256) public balanceOf;
+    mapping (address => mapping (address => uint256)) public allowance;
+    uint256 public totalSupply;
 
     modifier onlyValidAddress(address addr) {
         require(addr != address(0));
@@ -23,12 +23,12 @@ contract StandardToken is ERC20 {
     }
 
     modifier onlySufficientBalance(address from, uint256 value) {
-        require(value <= _balanceOf[from]);
+        require(value <= balanceOf[from]);
         _;
     }
 
     modifier onlySufficientAllowance(address from, address to, uint256 value) {
-        require(value <= _allowance[from][to]);
+        require(value <= allowance[from][to]);
         _;
     }
 
@@ -43,8 +43,8 @@ contract StandardToken is ERC20 {
         onlySufficientBalance(msg.sender, value)
         returns (bool)
     {
-        _balanceOf[msg.sender] = _balanceOf[msg.sender].sub(value);
-        _balanceOf[to] = _balanceOf[to].add(value);
+        balanceOf[msg.sender] = balanceOf[msg.sender].sub(value);
+        balanceOf[to] = balanceOf[to].add(value);
 
         emit Transfer(msg.sender, to, value);
 
@@ -64,9 +64,9 @@ contract StandardToken is ERC20 {
         onlySufficientAllowance(from, to, value)
         returns (bool)
     {
-        _balanceOf[from] = _balanceOf[from].sub(value);
-        _balanceOf[to] = _balanceOf[to].add(value);
-        _allowance[from][msg.sender] = _allowance[from][msg.sender].sub(value);
+        balanceOf[from] = balanceOf[from].sub(value);
+        balanceOf[to] = balanceOf[to].add(value);
+        allowance[from][msg.sender] = allowance[from][msg.sender].sub(value);
 
         emit Transfer(from, to, value);
 
@@ -84,7 +84,7 @@ contract StandardToken is ERC20 {
      * @param value The amount of tokens to be spent.
      */
     function approve(address spender, uint256 value) public returns (bool) {
-        _allowance[msg.sender][spender] = value;
+        allowance[msg.sender][spender] = value;
 
         emit Approval(msg.sender, spender, value);
 
@@ -92,29 +92,18 @@ contract StandardToken is ERC20 {
     }
 
     /**
-     * @dev Function to check the amount of tokens that an owner allowed to a spender.
-     * @param owner address The address which owns the funds.
-     * @param spender address The address which will spend the funds.
-     * @return A uint256 specifying the amount of tokens still available for the spender.
-     */
-    function allowance(address owner, address spender) public view returns (uint256) {
-        return _allowance[owner][spender];
-    }
-
-    /**
      * @dev Increase the amount of tokens that an owner allowed to a spender.
      *
-     * approve should be called when _allowance[spender] == 0. To increment
+     * approve should be called when allowance[spender] == 0. To increment
      * allowed value is better to use this function to avoid 2 calls (and wait until
      * the first transaction is mined)
-     * From MonolithDAO Token.sol
      * @param spender The address which will spend the funds.
      * @param addedValue The amount of tokens to increase the allowance by.
      */
     function increaseApproval(address spender, uint addedValue) public returns (bool) {
-        _allowance[msg.sender][spender] = _allowance[msg.sender][spender].add(addedValue);
+        allowance[msg.sender][spender] = allowance[msg.sender][spender].add(addedValue);
 
-        emit Approval(msg.sender, spender, _allowance[msg.sender][spender]);
+        emit Approval(msg.sender, spender, allowance[msg.sender][spender]);
 
         return true;
     }
@@ -122,39 +111,22 @@ contract StandardToken is ERC20 {
     /**
      * @dev Decrease the amount of tokens that an owner allowed to a spender.
      *
-     * approve should be called when _allowance[spender] == 0. To decrement
+     * approve should be called when allowance[spender] == 0. To decrement
      * allowed value is better to use this function to avoid 2 calls (and wait until
      * the first transaction is mined)
-     * From MonolithDAO Token.sol
      * @param spender The address which will spend the funds.
      * @param subtractedValue The amount of tokens to decrease the allowance by.
      */
     function decreaseApproval(address spender, uint subtractedValue) public returns (bool) {
-        uint oldValue = _allowance[msg.sender][spender];
+        uint oldValue = allowance[msg.sender][spender];
         if (subtractedValue > oldValue) {
-            _allowance[msg.sender][spender] = 0;
+            allowance[msg.sender][spender] = 0;
         } else {
-            _allowance[msg.sender][spender] = oldValue.sub(subtractedValue);
+            allowance[msg.sender][spender] = oldValue.sub(subtractedValue);
         }
 
-        emit Approval(msg.sender, spender, _allowance[msg.sender][spender]);
+        emit Approval(msg.sender, spender, allowance[msg.sender][spender]);
 
         return true;
-    }
-
-    /**
-      * @dev total number of tokens in existence
-      */
-    function totalSupply() public view returns (uint256) {
-        return _totalSupply;
-    }
-
-    /**
-     * @dev Gets the balance of the specified address.
-     * @param owner The address to query the the balance of.
-     * @return An uint256 representing the amount owned by the passed address.
-     */
-    function balanceOf(address owner) public view returns (uint256 balance) {
-        return _balanceOf[owner];
     }
 }
