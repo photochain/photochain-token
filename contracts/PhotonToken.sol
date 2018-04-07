@@ -7,4 +7,11 @@ contract PhotonToken is MintableToken {
     string public name = "Photon";
     string public symbol = "PHT";
     uint256 public decimals = 18;
+    uint256 public maximumSupply = 230 * 10**6 * 10**decimals;
+
+    function PhotonToken()
+        public
+        MintableToken(maximumSupply)
+    {
+    }
 }

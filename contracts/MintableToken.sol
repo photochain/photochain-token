@@ -11,6 +11,7 @@ import "./Ownable.sol";
  */
 contract MintableToken is StandardToken, Ownable {
     bool public mintingFinished;
+    uint256 public maximumSupply;
 
     event Mint(address indexed to, uint256 amount);
     event MintFinished();
@@ -20,16 +21,26 @@ contract MintableToken is StandardToken, Ownable {
         _;
     }
 
+    modifier onlyNotExceedingMaximumSupply(uint256 amount) {
+        require(totalSupply.add(amount) <= maximumSupply);
+        _;
+    }
+
+    function MintableToken(uint256 _maximumSupply) public {
+        maximumSupply = _maximumSupply;
+    }
+
     /**
-     * @dev Create tokens for given address
+     * @dev Creates new tokens for the given address
      * @param to The address that will receive the minted tokens.
      * @param amount The amount of tokens to mint.
      * @return A boolean that indicates if the operation was successful.
      */
     function mint(address to, uint256 amount)
+        public
         onlyOwner
         onlyMinting
-        public
+        onlyNotExceedingMaximumSupply(amount)
         returns (bool)
     {
         totalSupply = totalSupply.add(amount);
@@ -42,13 +53,13 @@ contract MintableToken is StandardToken, Ownable {
     }
 
     /**
-     * @dev Function to stop minting new tokens.
+     * @dev Stops minting new tokens.
      * @return True if the operation was successful.
      */
     function finishMinting()
+        public
         onlyOwner
         onlyMinting
-        public
         returns (bool)
     {
         mintingFinished = true;
