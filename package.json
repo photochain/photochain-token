@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "compile": "truffle compile",
-    "test": "ts-node $(npm bin)/truffle test"
+    "test": "ts-node $(npm bin)/truffle test",
+    "lint": "run-p -c --aggregate-output lint:solium",
+    "lint:solium": "solium -d contracts"
   },
   "repository": {
     "type": "git",
@@ -27,6 +29,8 @@
   },
   "homepage": "https://github.com/photochain/photon-token#readme",
   "devDependencies": {
+    "npm-run-all": "^4.1.2",
+    "solium": "^1.1.6",
     "truffle": "^4.1.5",
     "ts-node": "^5.0.1",
     "typescript": "^2.8.1"
