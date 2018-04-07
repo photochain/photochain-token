@@ -22,7 +22,7 @@ contract MintableToken is StandardToken, Ownable {
     }
 
     modifier onlyNotExceedingMaximumSupply(uint256 amount) {
-        require(totalSupply.add(amount) <= maximumSupply);
+        require(_totalSupply.add(amount) <= maximumSupply);
         _;
     }
 
@@ -43,8 +43,8 @@ contract MintableToken is StandardToken, Ownable {
         onlyNotExceedingMaximumSupply(amount)
         returns (bool)
     {
-        totalSupply = totalSupply.add(amount);
-        balanceOf[to] = balanceOf[to].add(amount);
+        _totalSupply = _totalSupply.add(amount);
+        _balanceOf[to] = _balanceOf[to].add(amount);
 
         emit Mint(to, amount);
         emit Transfer(address(0), to, amount);

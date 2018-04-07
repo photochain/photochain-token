@@ -4,8 +4,11 @@
     "description": "Photon token of Photochain platform",
     "main": "index.js",
     "scripts": {
-        "compile": "truffle compile",
-        "test": "ts-node $(npm bin)/truffle test",
+        "compile": "run-p -c --aggregate-output compile:sol compile:ts",
+        "compile:sol": "truffle compile --contracts_build_directory .cache/contracts",
+        "compile:ts": "tsc",
+        "test": "run-s compile test:truffle",
+        "test:truffle": "truffle test --contracts_build_directory .cache/contracts",
         "lint": "run-p -c --aggregate-output lint:solium lint:tslint",
         "lint:tslint": "tslint --project .",
         "lint:solium": "solium -d contracts",
@@ -35,11 +38,11 @@
         "@types/mocha": "^5.0.0",
         "@types/node": "^9.6.2",
         "bignumber.js": "^6.0.0",
+        "chai": "^4.1.2",
         "npm-run-all": "^4.1.2",
         "prettier": "^1.11.1",
         "solium": "^1.1.6",
         "truffle": "^4.1.5",
-        "ts-node": "^5.0.1",
         "tslint": "^5.9.1",
         "typescript": "^2.8.1"
     }

@@ -1,1 +1,5 @@
 node_modules/
+.cache/
+
+migrations/*.js
+test/*.js
