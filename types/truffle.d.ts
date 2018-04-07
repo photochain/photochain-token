@@ -9,15 +9,9 @@ declare module 'truffle' {
     namespace truffle {
         type ScriptFinalizer = ((err?: any) => void);
 
-        type ContractCallback = (
-            this: Mocha.ISuiteCallbackContext,
-            accounts: Address[]
-        ) => void;
+        type ContractCallback = (this: Mocha.ISuiteCallbackContext, accounts: Address[]) => void;
 
-        type ContractContextDefinition = (
-            description: string,
-            callback: ContractCallback
-        ) => Mocha.ISuite;
+        type ContractContextDefinition = (description: string, callback: ContractCallback) => Mocha.ISuite;
 
         interface Request {
             method: 'eth_call' | 'eth_sendTransaction';
@@ -94,10 +88,7 @@ declare module 'truffle' {
         interface Deployer extends Promise<void> {
             deploy(object: ContractBase, ...args: any[]): Promise<void>;
 
-            link(
-                library: ContractBase,
-                contracts: ContractBase | [ContractBase]
-            ): Promise<void>;
+            link(library: ContractBase, contracts: ContractBase | [ContractBase]): Promise<void>;
         }
     }
 

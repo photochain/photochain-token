@@ -10,15 +10,9 @@ declare module 'photon' {
 
     namespace photon {
         interface Migrations extends ContractBase {
-            setCompleted(
-                completed: number,
-                options?: TransactionOptions
-            ): Promise<TransactionResult>;
+            setCompleted(completed: number, options?: TransactionOptions): Promise<TransactionResult>;
 
-            upgrade(
-                address: Address,
-                options?: TransactionOptions
-            ): Promise<TransactionResult>;
+            upgrade(address: Address, options?: TransactionOptions): Promise<TransactionResult>;
         }
 
         interface Ownable extends ContractBase {
