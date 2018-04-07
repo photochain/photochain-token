@@ -3,10 +3,12 @@ pragma solidity ^0.4.21;
 import { Ownable } from "./Ownable.sol";
 
 
+/**
+ * @title Truffle Migrations contract
+ * @dev It violates standard naming convention for compatibility with Truffle suite
+ * @dev It extends standard implementation with changeable owner.
+ */
 contract Migrations is Ownable {
-    /* solhint-disable var-name-mixedcase */
-    /* solhint-disable func-param-name-mixedcase */
-
     uint public last_completed_migration;
 
     function setCompleted(uint completed) public onlyOwner {
