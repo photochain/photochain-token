@@ -8,6 +8,7 @@ declare module 'photon' {
         TruffleArtifacts
     } from 'truffle';
     import { AnyNumber } from 'web3';
+    import { BigNumber } from 'bignumber.js';
 
     namespace photon {
         interface Migrations extends ContractBase {
@@ -59,6 +60,13 @@ declare module 'photon' {
 
             finishMinting(options?: TransactionOptions): Promise<TransactionResult>;
         }
+
+        interface MintEvent {
+            to: Address;
+            amount: BigNumber;
+        }
+
+        type MintFinishedEvent = {};
 
         interface PhotonToken extends MintableToken {
             name(): Promise<string>;
