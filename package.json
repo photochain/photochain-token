@@ -29,6 +29,10 @@
   },
   "homepage": "https://github.com/photochain/photon-token#readme",
   "devDependencies": {
+    "@types/chai": "^4.1.2",
+    "@types/mocha": "^5.0.0",
+    "@types/node": "^9.6.2",
+    "bignumber.js": "^6.0.0",
     "npm-run-all": "^4.1.2",
     "solium": "^1.1.6",
     "truffle": "^4.1.5",
