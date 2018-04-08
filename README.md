@@ -51,6 +51,22 @@ Minting is possible only by the owner of the contract. By default, it is the dep
 The hard cap serves as additional protection against exceeding the maximum supply of 230 mln PHT.
 Total supply can be lower because only sold and allocated tokens are minted.
 
+## Distribution process
+
+After crowdsale end, contributions will be processed taking into account time of contribution, crowdsale stage and
+vesting periods. Calculated amount of tokens will be minted for each contributor calling `mint()` function:
+
+```javascript
+for (const contributor of contributors) {
+    await photon.mint(contributor.address, contributor.amount);
+}
+
+await photon.finishMinting();
+```
+
+When all sold and allocated tokens are minted, `finishMinting()` will be called to prevent further creation of Photons.
+Participants will be able to see their balances and transfer tokens immediately or after the expiration of their vesting period.
+
 # Tests
 
 To run tests, first install dependencies:
