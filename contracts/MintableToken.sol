@@ -1,4 +1,4 @@
-pragma solidity ^0.4.21;
+pragma solidity ^0.4.24;
 
 import "./StandardToken.sol";
 import "./Ownable.sol";
@@ -26,7 +26,7 @@ contract MintableToken is StandardToken, Ownable {
         _;
     }
 
-    function MintableToken(uint256 _maximumSupply) public {
+    constructor(uint256 _maximumSupply) public {
         maximumSupply = _maximumSupply;
     }
 
