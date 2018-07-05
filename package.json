@@ -9,6 +9,8 @@
         "compile:ts": "tsc",
         "test": "run-s compile test:truffle",
         "test:truffle": "truffle test --contracts_build_directory .cache/contracts",
+        "migrate:rinkeby": "run-s compile:ts migrate:rinkeby:js",
+        "migrate:rinkeby:js": "truffle migrate --network rinkeby",
         "lint": "run-p -c --aggregate-output lint:solium lint:tslint",
         "lint:tslint": "tslint --project .",
         "lint:solium": "solium -d contracts",
