@@ -3,10 +3,10 @@ import { Deployer } from 'truffle';
 
 declare const artifacts: PhotonArtifacts;
 
-const PhotonToken = artifacts.require('./PhotonToken.sol');
+const PhotonTestToken = artifacts.require('./PhotonTestToken.sol');
 
 async function deploy(deployer: Deployer) {
-    await deployer.deploy(PhotonToken);
+    await deployer.deploy(PhotonTestToken);
 }
 
 function migrate(deployer: Deployer) {

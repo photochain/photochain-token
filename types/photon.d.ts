@@ -75,6 +75,8 @@ declare module 'photon' {
             maximumSupply(): Promise<BigNumber>;
         }
 
+        type PhotonTestToken = PhotonToken;
+
         interface MigrationsContract extends Contract<Migrations> {
             'new'(options?: TransactionOptions): Promise<Migrations>;
         }
@@ -83,10 +85,15 @@ declare module 'photon' {
             'new'(options?: TransactionOptions): Promise<PhotonToken>;
         }
 
+        interface PhotonTestTokenContract extends Contract<PhotonTestToken> {
+            'new'(options?: TransactionOptions): Promise<PhotonTestToken>;
+        }
+
         interface PhotonArtifacts extends TruffleArtifacts {
             require(name: string): AnyContract;
             require(name: './Migrations.sol'): MigrationsContract;
             require(name: './PhotonToken.sol'): PhotonTokenContract;
+            require(name: './PhotonTestToken.sol'): PhotonTestTokenContract;
         }
     }
 

@@ -1,5 +1,5 @@
 import { assert } from 'chai';
-import { MintEvent, MintFinishedEvent, PhotonArtifacts, PhotonToken, TransferEvent } from 'photon';
+import { MintEvent, MintFinishedEvent, PhotonArtifacts, PhotonTestToken, TransferEvent } from 'photon';
 import { ContractContextDefinition } from 'truffle';
 import * as Web3 from 'web3';
 
@@ -9,25 +9,25 @@ declare const web3: Web3;
 declare const artifacts: PhotonArtifacts;
 declare const contract: ContractContextDefinition;
 
-const PhotonToken = artifacts.require('./PhotonToken.sol');
+const PhotonTestToken = artifacts.require('./PhotonTestToken.sol');
 
-contract('PhotonToken', accounts => {
+contract('PhotonTestToken', accounts => {
     const owner = accounts[0];
     const nonOwner = accounts[2];
 
     describe('Constructor', () => {
-        let token: PhotonToken;
+        let token: PhotonTestToken;
 
         beforeEach(async () => {
-            token = await PhotonToken.deployed();
+            token = await PhotonTestToken.deployed();
         });
 
         it('should set name', async () => {
-            assert.equal(await token.name(), 'PhotonToken');
+            assert.equal(await token.name(), 'PhotonTestToken');
         });
 
         it('should set symbol', async () => {
-            assert.equal(await token.symbol(), 'PHT');
+            assert.equal(await token.symbol(), 'PHTT');
         });
 
         it('should set decimals', async () => {
@@ -43,7 +43,7 @@ contract('PhotonToken', accounts => {
         });
 
         it('should set maximumSupply', async () => {
-            assertPhotonEqual(await token.maximumSupply(), toPhoton(230_000_000));
+            assertPhotonEqual(await token.maximumSupply(), toPhoton(1_000_000_000_000));
         });
 
         it('should be minting', async () => {
@@ -54,10 +54,10 @@ contract('PhotonToken', accounts => {
     describe('Function mint', () => {
         const beneficiary = accounts[1];
         const amount = toPhoton(100);
-        let token: PhotonToken;
+        let token: PhotonTestToken;
 
         beforeEach(async () => {
-            token = await PhotonToken.new();
+            token = await PhotonTestToken.new();
         });
 
         it('should increase totalSupply', async () => {
@@ -125,10 +125,10 @@ contract('PhotonToken', accounts => {
     });
 
     describe('Function finishMinting', () => {
-        let token: PhotonToken;
+        let token: PhotonTestToken;
 
         beforeEach(async () => {
-            token = await PhotonToken.new();
+            token = await PhotonTestToken.new();
         });
 
         it('should set mintingFinished', async () => {
