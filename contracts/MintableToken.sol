@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24;
+pragma solidity 0.4.24;
 
 import "./StandardToken.sol";
 import "./Ownable.sol";
@@ -17,12 +17,12 @@ contract MintableToken is StandardToken, Ownable {
     event MintFinished();
 
     modifier onlyMinting() {
-        require(!mintingFinished);
+        require(!mintingFinished, "Minting is already finished");
         _;
     }
 
     modifier onlyNotExceedingMaximumSupply(uint256 amount) {
-        require(_totalSupply.add(amount) <= maximumSupply);
+        require(_totalSupply.add(amount) <= maximumSupply, "Total supply must not exceed maximum supply");
         _;
     }
 
@@ -36,6 +36,7 @@ contract MintableToken is StandardToken, Ownable {
      * @param amount The amount of tokens to mint.
      * @return A boolean that indicates if the operation was successful.
      */
+    // solhint-disable-next-line no-simple-event-func-name
     function mint(address to, uint256 amount)
         public
         onlyOwner

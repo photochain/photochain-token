@@ -7,7 +7,7 @@ Collection of Ethereum smart contracts for the
 # Technology
 
 The project uses [Truffle framework](http://truffleframework.com/) and the smart
-contracts are written in Solidity language (version 0.4.21).
+contracts are written in Solidity language (version 0.4.24).
 
 To compile the smart contracts and run tests you need:
 - NodeJS in version 6 or above

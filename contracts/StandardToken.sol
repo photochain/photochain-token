@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24;
+pragma solidity 0.4.24;
 
 import "./ERC20.sol";
 import "./SafeMath.sol";
@@ -18,17 +18,17 @@ contract StandardToken is ERC20 {
     mapping (address => mapping (address => uint256)) internal _allowance;
 
     modifier onlyValidAddress(address addr) {
-        require(addr != address(0));
+        require(addr != address(0), "Address cannot be zero");
         _;
     }
 
     modifier onlySufficientBalance(address from, uint256 value) {
-        require(value <= _balanceOf[from]);
+        require(value <= _balanceOf[from], "Insufficient balance");
         _;
     }
 
     modifier onlySufficientAllowance(address from, address to, uint256 value) {
-        require(value <= _allowance[from][to]);
+        require(value <= _allowance[from][to], "Insufficient allowance");
         _;
     }
 

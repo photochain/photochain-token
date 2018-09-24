@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24;
+pragma solidity 0.4.24;
 
 
 /**
@@ -13,12 +13,12 @@ contract Ownable {
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
     modifier onlyOwner() {
-        require(msg.sender == owner);
+        require(msg.sender == owner, "Can only be called by the owner");
         _;
     }
 
     modifier onlyValidAddress(address addr) {
-        require(addr != address(0));
+        require(addr != address(0), "Address cannot be zero");
         _;
     }
 
