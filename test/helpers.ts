@@ -21,11 +21,11 @@ export function assertNumberEqual(actual: AnyNumber, expect: AnyNumber, decimals
     }
 }
 
-export function assertPhotonEqual(actual: AnyNumber, expect: AnyNumber) {
+export function assertPhtEqual(actual: AnyNumber, expect: AnyNumber) {
     return assertNumberEqual(actual, expect, PHT_DECIMALS);
 }
 
-export function toPhoton(num: AnyNumber) {
+export function toPht(num: AnyNumber) {
     return shiftNumber(num, PHT_DECIMALS);
 }
 

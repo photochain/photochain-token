@@ -1,12 +1,12 @@
-import { PhotonArtifacts } from 'photon';
+import { PhotochainArtifacts } from 'photochain';
 import { Deployer } from 'truffle';
 
-declare const artifacts: PhotonArtifacts;
+declare const artifacts: PhotochainArtifacts;
 
-const PhotonTestToken = artifacts.require('./PhotonTestToken.sol');
+const PhotochainTestToken = artifacts.require('./PhotochainTestToken.sol');
 
 async function deploy(deployer: Deployer) {
-    await deployer.deploy(PhotonTestToken);
+    await deployer.deploy(PhotochainTestToken);
 }
 
 function migrate(deployer: Deployer) {

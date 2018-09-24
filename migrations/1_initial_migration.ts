@@ -1,7 +1,7 @@
-import { PhotonArtifacts } from 'photon';
+import { PhotochainArtifacts } from 'photochain';
 import { Deployer } from 'truffle';
 
-declare const artifacts: PhotonArtifacts;
+declare const artifacts: PhotochainArtifacts;
 
 const Migrations = artifacts.require('./Migrations.sol');
 

@@ -1,29 +1,29 @@
 import { assert } from 'chai';
-import { MintEvent, MintFinishedEvent, PhotonArtifacts, PhotonTestToken, TransferEvent } from 'photon';
+import { MintEvent, MintFinishedEvent, PhotochainArtifacts, PhotochainTestToken, TransferEvent } from 'photochain';
 import { ContractContextDefinition } from 'truffle';
 import * as Web3 from 'web3';
 
-import { assertNumberEqual, assertPhotonEqual, assertReverts, findLastLog, PHT_DECIMALS, toPhoton } from './helpers';
+import { assertNumberEqual, assertPhtEqual, assertReverts, findLastLog, PHT_DECIMALS, toPht } from './helpers';
 
 declare const web3: Web3;
-declare const artifacts: PhotonArtifacts;
+declare const artifacts: PhotochainArtifacts;
 declare const contract: ContractContextDefinition;
 
-const PhotonTestToken = artifacts.require('./PhotonTestToken.sol');
+const PhotochainTestToken = artifacts.require('./PhotochainTestToken.sol');
 
-contract('PhotonTestToken', accounts => {
+contract('PhotochainTestToken', accounts => {
     const owner = accounts[0];
     const nonOwner = accounts[2];
 
     describe('Constructor', () => {
-        let token: PhotonTestToken;
+        let token: PhotochainTestToken;
 
         beforeEach(async () => {
-            token = await PhotonTestToken.deployed();
+            token = await PhotochainTestToken.deployed();
         });
 
         it('should set name', async () => {
-            assert.equal(await token.name(), 'PhotonTestToken');
+            assert.equal(await token.name(), 'PhotochainTestToken');
         });
 
         it('should set symbol', async () => {
@@ -35,7 +35,7 @@ contract('PhotonTestToken', accounts => {
         });
 
         it('should start with zero totalSupply', async () => {
-            assertPhotonEqual(await token.totalSupply(), 0);
+            assertPhtEqual(await token.totalSupply(), 0);
         });
 
         it('should set owner', async () => {
@@ -43,7 +43,7 @@ contract('PhotonTestToken', accounts => {
         });
 
         it('should set maximumSupply', async () => {
-            assertPhotonEqual(await token.maximumSupply(), toPhoton(1_000_000_000_000));
+            assertPhtEqual(await token.maximumSupply(), toPht(1_000_000_000_000));
         });
 
         it('should be minting', async () => {
@@ -53,25 +53,25 @@ contract('PhotonTestToken', accounts => {
 
     describe('Function mint', () => {
         const beneficiary = accounts[1];
-        const amount = toPhoton(100);
-        let token: PhotonTestToken;
+        const amount = toPht(100);
+        let token: PhotochainTestToken;
 
         beforeEach(async () => {
-            token = await PhotonTestToken.new();
+            token = await PhotochainTestToken.new();
         });
 
         it('should increase totalSupply', async () => {
             const prevSupply = await token.totalSupply();
             await token.mint(beneficiary, amount);
 
-            assertPhotonEqual(await token.totalSupply(), prevSupply.add(amount));
+            assertPhtEqual(await token.totalSupply(), prevSupply.add(amount));
         });
 
         it('should increase balance', async () => {
             const prevBalance = await token.balanceOf(beneficiary);
             await token.mint(beneficiary, amount);
 
-            assertPhotonEqual(await token.balanceOf(beneficiary), prevBalance.add(amount));
+            assertPhtEqual(await token.balanceOf(beneficiary), prevBalance.add(amount));
         });
 
         it('should emit Mint event', async () => {
@@ -83,7 +83,7 @@ contract('PhotonTestToken', accounts => {
             const event = log.args as MintEvent;
             assert.isOk(event);
             assert.equal(event.to, beneficiary);
-            assertPhotonEqual(event.amount, amount);
+            assertPhtEqual(event.amount, amount);
         });
 
         it('should emit Transfer event', async () => {
@@ -96,7 +96,7 @@ contract('PhotonTestToken', accounts => {
             assert.isOk(event);
             assert.equal(event.from, '0x' + '0'.repeat(40));
             assert.equal(event.to, beneficiary);
-            assertPhotonEqual(event.value, amount);
+            assertPhtEqual(event.value, amount);
         });
 
         it('should revert when minting is finished', async () => {
@@ -125,10 +125,10 @@ contract('PhotonTestToken', accounts => {
     });
 
     describe('Function finishMinting', () => {
-        let token: PhotonTestToken;
+        let token: PhotochainTestToken;
 
         beforeEach(async () => {
-            token = await PhotonTestToken.new();
+            token = await PhotochainTestToken.new();
         });
 
         it('should set mintingFinished', async () => {

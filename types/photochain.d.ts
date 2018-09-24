@@ -1,4 +1,4 @@
-declare module 'photon' {
+declare module 'photochain' {
     import {
         AnyContract,
         Contract,
@@ -10,7 +10,7 @@ declare module 'photon' {
     import { AnyNumber } from 'web3';
     import { BigNumber } from 'bignumber.js';
 
-    namespace photon {
+    namespace photochain {
         interface Migrations extends ContractBase {
             setCompleted(completed: number, options?: TransactionOptions): Promise<TransactionResult>;
 
@@ -68,34 +68,34 @@ declare module 'photon' {
 
         type MintFinishedEvent = {};
 
-        interface PhotonToken extends MintableToken {
+        interface PhotochainToken extends MintableToken {
             name(): Promise<string>;
             symbol(): Promise<string>;
             decimals(): Promise<BigNumber>;
             maximumSupply(): Promise<BigNumber>;
         }
 
-        type PhotonTestToken = PhotonToken;
+        type PhotochainTestToken = PhotochainToken;
 
         interface MigrationsContract extends Contract<Migrations> {
             'new'(options?: TransactionOptions): Promise<Migrations>;
         }
 
-        interface PhotonTokenContract extends Contract<PhotonToken> {
-            'new'(options?: TransactionOptions): Promise<PhotonToken>;
+        interface PhotochainTokenContract extends Contract<PhotochainToken> {
+            'new'(options?: TransactionOptions): Promise<PhotochainToken>;
         }
 
-        interface PhotonTestTokenContract extends Contract<PhotonTestToken> {
-            'new'(options?: TransactionOptions): Promise<PhotonTestToken>;
+        interface PhotochainTestTokenContract extends Contract<PhotochainTestToken> {
+            'new'(options?: TransactionOptions): Promise<PhotochainTestToken>;
         }
 
-        interface PhotonArtifacts extends TruffleArtifacts {
+        interface PhotochainArtifacts extends TruffleArtifacts {
             require(name: string): AnyContract;
             require(name: './Migrations.sol'): MigrationsContract;
-            require(name: './PhotonToken.sol'): PhotonTokenContract;
-            require(name: './PhotonTestToken.sol'): PhotonTestTokenContract;
+            require(name: './PhotochainToken.sol'): PhotochainTokenContract;
+            require(name: './PhotochainTestToken.sol'): PhotochainTestTokenContract;
         }
     }
 
-    export = photon;
+    export = photochain;
 }

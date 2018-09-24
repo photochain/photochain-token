@@ -1,7 +1,7 @@
 {
-    "name": "photon-token",
+    "name": "photochain-token",
     "version": "1.0.0",
-    "description": "Photon token of Photochain platform",
+    "description": "Token of Photochain platform",
     "main": "index.js",
     "scripts": {
         "compile": "run-p -c --aggregate-output compile:sol compile:ts",
@@ -18,7 +18,7 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/photochain/photon-token.git"
+        "url": "git+https://github.com/photochain/photochain-token.git"
     },
     "keywords": [
         "photochain",
@@ -32,9 +32,9 @@
     },
     "license": "MIT",
     "bugs": {
-        "url": "https://github.com/photochain/photon-token/issues"
+        "url": "https://github.com/photochain/photochain-token/issues"
     },
-    "homepage": "https://github.com/photochain/photon-token#readme",
+    "homepage": "https://github.com/photochain/photochain-token#readme",
     "devDependencies": {
         "@types/chai": "^4.1.2",
         "@types/mocha": "^5.0.0",
