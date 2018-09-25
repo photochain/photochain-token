@@ -3,10 +3,10 @@ import { Deployer } from 'truffle';
 
 declare const artifacts: PhotochainArtifacts;
 
-const PhotochainTestToken = artifacts.require('./PhotochainTestToken.sol');
+const PhotochainToken = artifacts.require('./PhotochainToken.sol');
 
 async function deploy(deployer: Deployer) {
-    await deployer.deploy(PhotochainTestToken);
+    await deployer.deploy(PhotochainToken);
 }
 
 function migrate(deployer: Deployer) {

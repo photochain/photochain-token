@@ -75,8 +75,6 @@ declare module 'photochain' {
             maximumSupply(): Promise<BigNumber>;
         }
 
-        type PhotochainTestToken = PhotochainToken;
-
         interface MigrationsContract extends Contract<Migrations> {
             'new'(options?: TransactionOptions): Promise<Migrations>;
         }
@@ -85,15 +83,14 @@ declare module 'photochain' {
             'new'(options?: TransactionOptions): Promise<PhotochainToken>;
         }
 
-        interface PhotochainTestTokenContract extends Contract<PhotochainTestToken> {
-            'new'(options?: TransactionOptions): Promise<PhotochainTestToken>;
+        interface PhotochainTokenContract extends Contract<PhotochainToken> {
+            'new'(options?: TransactionOptions): Promise<PhotochainToken>;
         }
 
         interface PhotochainArtifacts extends TruffleArtifacts {
             require(name: string): AnyContract;
             require(name: './Migrations.sol'): MigrationsContract;
             require(name: './PhotochainToken.sol'): PhotochainTokenContract;
-            require(name: './PhotochainTestToken.sol'): PhotochainTestTokenContract;
         }
     }
 

@@ -1,5 +1,5 @@
 import { assert } from 'chai';
-import { MintEvent, MintFinishedEvent, PhotochainArtifacts, PhotochainTestToken, TransferEvent } from 'photochain';
+import { MintEvent, MintFinishedEvent, PhotochainArtifacts, PhotochainToken, TransferEvent } from 'photochain';
 import { ContractContextDefinition } from 'truffle';
 import * as Web3 from 'web3';
 
@@ -9,25 +9,25 @@ declare const web3: Web3;
 declare const artifacts: PhotochainArtifacts;
 declare const contract: ContractContextDefinition;
 
-const PhotochainTestToken = artifacts.require('./PhotochainTestToken.sol');
+const PhotochainToken = artifacts.require('./PhotochainToken.sol');
 
-contract('PhotochainTestToken', accounts => {
+contract('PhotochainToken', accounts => {
     const owner = accounts[0];
     const nonOwner = accounts[2];
 
     describe('Constructor', () => {
-        let token: PhotochainTestToken;
+        let token: PhotochainToken;
 
         beforeEach(async () => {
-            token = await PhotochainTestToken.deployed();
+            token = await PhotochainToken.deployed();
         });
 
         it('should set name', async () => {
-            assert.equal(await token.name(), 'PhotochainTestToken');
+            assert.equal(await token.name(), 'PhotochainToken');
         });
 
         it('should set symbol', async () => {
-            assert.equal(await token.symbol(), 'PHTT');
+            assert.equal(await token.symbol(), 'PHT');
         });
 
         it('should set decimals', async () => {
@@ -43,7 +43,7 @@ contract('PhotochainTestToken', accounts => {
         });
 
         it('should set maximumSupply', async () => {
-            assertPhtEqual(await token.maximumSupply(), toPht(1_000_000_000_000));
+            assertPhtEqual(await token.maximumSupply(), toPht(230_000_000));
         });
 
         it('should be minting', async () => {
@@ -54,10 +54,10 @@ contract('PhotochainTestToken', accounts => {
     describe('Function mint', () => {
         const beneficiary = accounts[1];
         const amount = toPht(100);
-        let token: PhotochainTestToken;
+        let token: PhotochainToken;
 
         beforeEach(async () => {
-            token = await PhotochainTestToken.new();
+            token = await PhotochainToken.new();
         });
 
         it('should increase totalSupply', async () => {
@@ -125,10 +125,10 @@ contract('PhotochainTestToken', accounts => {
     });
 
     describe('Function finishMinting', () => {
-        let token: PhotochainTestToken;
+        let token: PhotochainToken;
 
         beforeEach(async () => {
-            token = await PhotochainTestToken.new();
+            token = await PhotochainToken.new();
         });
 
         it('should set mintingFinished', async () => {
