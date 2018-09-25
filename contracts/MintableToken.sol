@@ -36,7 +36,6 @@ contract MintableToken is StandardToken, Ownable {
      * @param amount The amount of tokens to mint.
      * @return A boolean that indicates if the operation was successful.
      */
-    // solhint-disable-next-line no-simple-event-func-name
     function mint(address to, uint256 amount)
         public
         onlyOwner

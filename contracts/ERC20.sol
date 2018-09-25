@@ -6,13 +6,11 @@ pragma solidity 0.4.24;
  * @dev see https://github.com/ethereum/EIPs/issues/20
  */
 contract ERC20 {
-    // solhint-disable-next-line no-simple-event-func-name
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed owner, address indexed spender, uint256 value);
 
     function totalSupply() public view returns (uint256);
     function balanceOf(address who) public view returns (uint256);
-    // solhint-disable-next-line no-simple-event-func-name
     function transfer(address to, uint256 value) public returns (bool);
     function allowance(address owner, address spender) public view returns (uint256);
     function transferFrom(address from, address to, uint256 value) public returns (bool);
