@@ -40,14 +40,37 @@ contract MintableToken is StandardToken, Ownable {
         public
         onlyOwner
         onlyMinting
+        onlyValidAddress(to)
         onlyNotExceedingMaximumSupply(amount)
         returns (bool)
     {
-        _totalSupply = _totalSupply.add(amount);
-        _balanceOf[to] = _balanceOf[to].add(amount);
+        mintImpl(to, amount);
 
-        emit Mint(to, amount);
-        emit Transfer(address(0), to, amount);
+        return true;
+    }
+
+    /**
+     * @dev Creates new tokens for the given addresses
+     * @param addresses The array of addresses that will receive the minted tokens.
+     * @param amounts The array of amounts of tokens to mint.
+     * @return A boolean that indicates if the operation was successful.
+     */
+    function mintMany(address[] addresses, uint256[] amounts)
+        public
+        onlyOwner
+        onlyMinting
+        onlyNotExceedingMaximumSupply(sum(amounts))
+        returns (bool)
+    {
+        require(
+            addresses.length == amounts.length,
+            "Addresses array must be the same size as amounts array"
+        );
+
+        for (uint256 i = 0; i < addresses.length; i++) {
+            require(addresses[i] != address(0), "Address cannot be zero");
+            mintImpl(addresses[i], amounts[i]);
+        }
 
         return true;
     }
@@ -67,5 +90,21 @@ contract MintableToken is StandardToken, Ownable {
         emit MintFinished();
 
         return true;
+    }
+
+    function mintImpl(address to, uint256 amount) private {
+        _totalSupply = _totalSupply.add(amount);
+        _balanceOf[to] = _balanceOf[to].add(amount);
+
+        emit Mint(to, amount);
+        emit Transfer(address(0), to, amount);
+    }
+
+    function sum(uint256[] arr) private returns (uint256) {
+        uint256 aggr = 0;
+        for (uint256 i = 0; i < arr.length; i++) {
+            aggr = aggr.add(arr[i]);
+        }
+        return aggr;
     }
 }

@@ -57,6 +57,7 @@ declare module 'photochain' {
             isMintingManager(addr: Address): Promise<boolean>;
 
             mint(to: Address, amount: AnyNumber, options?: TransactionOptions): Promise<TransactionResult>;
+            mintMany(to: Address[], amount: AnyNumber[], options?: TransactionOptions): Promise<TransactionResult>;
 
             finishMinting(options?: TransactionOptions): Promise<TransactionResult>;
         }
