@@ -23,7 +23,7 @@ async function asyncExec() {
     const aggr = new TransactionAggregator(token, owner);
 
     await createReadStream(join(__dirname, 'phtdistribution.csv'))
-        .pipe(parse({delimiter: ',', from: 2}))
+        .pipe(parse({ delimiter: ',', from: 2 }))
         .on('data', async row => {
             const address = row[0];
             const amount = toPht(row[1]);
@@ -79,8 +79,10 @@ class TransactionAggregator {
 
     private mintAggregated() {
         const totalAmount = this.amounts.reduce((a: BigNumber, b: BigNumber) => a.add(b), new BigNumber(0));
-        console.log(`Sending minting transaction for ${this.addresses.length} addresses ` +
-                    `of total ${fromPht(totalAmount).toFixed()} PHT`);
+        console.log(
+            `Sending minting transaction for ${this.addresses.length} addresses ` +
+                `of total ${fromPht(totalAmount).toFixed()} PHT`
+        );
 
         this.txs.push(this.token.mintMany(this.addresses, this.amounts, { from: this.owner }));
 

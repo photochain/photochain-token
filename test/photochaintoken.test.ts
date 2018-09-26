@@ -190,7 +190,12 @@ contract('PhotochainToken', accounts => {
             const beneficiaries = [];
             const amounts = [];
             for (let i = 1; i <= maxMintMany; i++) {
-                beneficiaries.push(`0x${'0'.repeat(40).concat(i.toString()).slice(-40)}`);
+                beneficiaries.push(
+                    `0x${'0'
+                        .repeat(40)
+                        .concat(i.toString())
+                        .slice(-40)}`
+                );
                 amounts.push(toPht(100));
             }
             const totalAmount = amounts.reduce((a: BigNumber, b: BigNumber) => a.add(b), new BigNumber(0));
