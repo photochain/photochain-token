@@ -100,7 +100,7 @@ contract MintableToken is StandardToken, Ownable {
         emit Transfer(address(0), to, amount);
     }
 
-    function sum(uint256[] arr) private returns (uint256) {
+    function sum(uint256[] arr) private pure returns (uint256) {
         uint256 aggr = 0;
         for (uint256 i = 0; i < arr.length; i++) {
             aggr = aggr.add(arr[i]);

@@ -25,7 +25,7 @@ contract PhotochainVesting {
         require(_releaseTime > block.timestamp, "Release time must be in future");
 
         // solium-disable-next-line security/no-block-members
-        require(_releaseTime < block.timestamp + 3 years, "Release time must not exceed 3 years");
+        require(_releaseTime < block.timestamp + 3 * 365 days, "Release time must not exceed 3 years");
 
         token = _token;
         beneficiary = _beneficiary;
