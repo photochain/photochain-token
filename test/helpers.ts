@@ -4,6 +4,8 @@ import { findLast, propEq } from 'ramda';
 import { TransactionLog, TransactionResult } from 'truffle';
 import { AnyNumber } from 'web3';
 
+import * as Web3 from 'web3';
+
 export const PHT_DECIMALS = 18;
 
 export function assertNumberEqual(actual: AnyNumber, expect: AnyNumber, decimals: number = 0) {
@@ -31,6 +33,28 @@ export function toPht(num: AnyNumber) {
 
 export function fromPht(num: AnyNumber) {
     return shiftNumber(num, -PHT_DECIMALS);
+}
+
+export function calculateTimestampFromDays(days: number) {
+    const today = new Date().getDate();
+    const milliseconds = 1000;
+    return Math.floor(new Date().setDate(today + days) / milliseconds);
+}
+
+export function fastForward(web3: Web3, seconds: number) {
+    web3.currentProvider.send({
+        id: new Date().getTime(),
+        jsonrpc: '2.0',
+        method: 'evm_increaseTime',
+        params: [seconds]
+    });
+
+    web3.currentProvider.send({
+        id: new Date().getTime(),
+        jsonrpc: '2.0',
+        method: 'evm_mine',
+        params: []
+    });
 }
 
 export function shiftNumber(num: AnyNumber, decimals: number): BigNumber {

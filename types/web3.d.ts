@@ -50,7 +50,7 @@ declare module 'web3' {
         }
 
         interface Provider {
-            sendAsync(payload: RequestPayload, callback: (err: Error | null, result: ResponsePayload) => void): void;
+            send(payload: RequestPayload, callback?: (err: Error | null, result: ResponsePayload) => void): void;
         }
 
         interface TxData {

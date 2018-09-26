@@ -76,6 +76,14 @@ declare module 'photochain' {
             maximumSupply(): Promise<BigNumber>;
         }
 
+        interface PhotochainVesting extends ContractBase {
+            token(): Promise<Address>;
+            beneficiary(): Promise<Address>;
+            releaseTime(): Promise<BigNumber>;
+
+            release(): Promise<TransactionResult>;
+        }
+
         interface MigrationsContract extends Contract<Migrations> {
             'new'(options?: TransactionOptions): Promise<Migrations>;
         }
@@ -84,14 +92,20 @@ declare module 'photochain' {
             'new'(options?: TransactionOptions): Promise<PhotochainToken>;
         }
 
-        interface PhotochainTokenContract extends Contract<PhotochainToken> {
-            'new'(options?: TransactionOptions): Promise<PhotochainToken>;
+        interface PhotochainVestingContract extends Contract<PhotochainVesting> {
+            'new'(
+                token: Address,
+                beneficiary: Address,
+                releaseTime: AnyNumber,
+                options?: TransactionOptions
+            ): Promise<PhotochainVesting>;
         }
 
         interface PhotochainArtifacts extends TruffleArtifacts {
             require(name: string): AnyContract;
             require(name: './Migrations.sol'): MigrationsContract;
             require(name: './PhotochainToken.sol'): PhotochainTokenContract;
+            require(name: './PhotochainVesting.sol'): PhotochainVestingContract;
         }
     }
 
