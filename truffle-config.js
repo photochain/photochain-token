@@ -1,10 +1,11 @@
 module.exports = {
-  networks: {
-    rinkeby: {
-      from: '0x0A808b4b178921Bd44F30656a77056344Ca86712',
-      host: 'localhost',
-      port: 8545,
-      network_id: '4'
+    networks: {
+        rinkeby: {
+            from: '0xED3f6E6B5fFc52E37Ea6a02D78193b558EF0C428',
+            host: 'localhost',
+            port: 8545,
+            network_id: '4',
+            gasPrice: 14
+        }
     }
-  }
 };
