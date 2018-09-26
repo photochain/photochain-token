@@ -126,7 +126,7 @@ contract('PhotochainToken', accounts => {
     });
 
     describe('Function mintMany', () => {
-        const beneficiaries = accounts.slice(1, 5);
+        const addresses = accounts.slice(1, 5);
         const amounts = [toPht(100), toPht(150), toPht(50), toPht(200)];
         const totalAmount = amounts.reduce((a: BigNumber, b: BigNumber) => a.add(b), new BigNumber(0));
 
@@ -138,17 +138,17 @@ contract('PhotochainToken', accounts => {
 
         it('should increase totalSupply', async () => {
             const prevSupply = await token.totalSupply();
-            await token.mintMany(beneficiaries, amounts);
+            await token.mintMany(addresses, amounts);
 
             assertPhtEqual(await token.totalSupply(), prevSupply.add(totalAmount));
         });
 
         it('should increase balances', async () => {
-            const prevBalances = await Promise.all(beneficiaries.map(b => token.balanceOf(b)));
-            await token.mintMany(beneficiaries, amounts);
+            const prevBalances = await Promise.all(addresses.map(a => token.balanceOf(a)));
+            await token.mintMany(addresses, amounts);
 
-            for (let i = 0; i < beneficiaries.length; i++) {
-                const beneficiary = beneficiaries[i];
+            for (let i = 0; i < addresses.length; i++) {
+                const beneficiary = addresses[i];
                 const prevBalance = prevBalances[i];
                 const amount = amounts[i];
 
@@ -157,43 +157,61 @@ contract('PhotochainToken', accounts => {
         });
 
         it('should emit Mint events', async () => {
-            const tx = await token.mintMany(beneficiaries, amounts);
+            const tx = await token.mintMany(addresses, amounts);
             const logs = tx.logs.filter(log => log.event === 'Mint');
 
-            assert.lengthOf(logs, beneficiaries.length);
+            assert.lengthOf(logs, addresses.length);
 
-            for (let i = 0; i < beneficiaries.length; i++) {
+            for (let i = 0; i < addresses.length; i++) {
                 const event = logs[i].args as MintEvent;
-                assert.equal(event.to, beneficiaries[i]);
+                assert.equal(event.to, addresses[i]);
                 assertPhtEqual(event.amount, amounts[i]);
             }
         });
 
         it('should emit Transfer events', async () => {
-            const tx = await token.mintMany(beneficiaries, amounts);
+            const tx = await token.mintMany(addresses, amounts);
             const logs = tx.logs.filter(log => log.event === 'Transfer');
 
-            assert.lengthOf(logs, beneficiaries.length);
+            assert.lengthOf(logs, addresses.length);
 
-            for (let i = 0; i < beneficiaries.length; i++) {
+            for (let i = 0; i < addresses.length; i++) {
                 const event = logs[i].args as TransferEvent;
                 assert.equal(event.from, '0x' + '0'.repeat(40));
-                assert.equal(event.to, beneficiaries[i]);
+                assert.equal(event.to, addresses[i]);
                 assertPhtEqual(event.value, amounts[i]);
             }
+        });
+
+        const maxMintMany = 200;
+        it.only(`should accept ${maxMintMany} addresses at once`, async () => {
+            const prevSupply = await token.totalSupply();
+
+            const addresses = [];
+            const amounts = [];
+            for (let i = 1; i <= maxMintMany; i++) {
+                addresses.push(`0x${'0'.repeat(40).concat(i.toString()).slice(-40)}`);
+                amounts.push(toPht(100));
+            }
+            const totalAmount = amounts.reduce((a: BigNumber, b: BigNumber) => a.add(b), new BigNumber(0));
+
+            await token.mintMany(addresses, amounts);
+
+            // check total supply change to confirm the transaction has succeeded
+            assertPhtEqual(await token.totalSupply(), prevSupply.add(totalAmount));
         });
 
         it('should revert when minting is finished', async () => {
             await token.finishMinting();
 
             await assertReverts(async () => {
-                await token.mintMany(beneficiaries, amounts);
+                await token.mintMany(addresses, amounts);
             });
         });
 
         it('should revert when called by non-owner', async () => {
             await assertReverts(async () => {
-                await token.mintMany(beneficiaries, amounts, {
+                await token.mintMany(addresses, amounts, {
                     from: nonOwner
                 });
             });
