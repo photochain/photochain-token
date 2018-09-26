@@ -2,6 +2,7 @@
     "extends": "default",
     "rules": {
         "bracket-align": false,
-        "no-simple-event-func-name": false
+        "no-simple-event-func-name": false,
+        "not-rely-on-time": false
     }
 }

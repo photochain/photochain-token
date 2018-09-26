@@ -45,13 +45,13 @@ function exec(finalize: ScriptFinalizer) {
 class TransactionAggregator {
     private static readonly MAX_MINT_MANY = 200;
 
-    txs: Promise<TransactionResult>[] = []
-    addresses: string[] = [];
-    amounts: BigNumber[] = [];
+    private txs: Array<Promise<TransactionResult>> = [];
+    private addresses: string[] = [];
+    private amounts: BigNumber[] = [];
 
     constructor(private token: PhotochainToken, private owner: string) {}
 
-    queue(address: string, amount: BigNumber, vestingDays: number) {
+    public queue(address: string, amount: BigNumber, vestingDays: number) {
         let holder = address;
         if (vestingDays > 0) {
             console.log(`Address ${address} under vesting period of ${vestingDays} days`);
@@ -68,7 +68,7 @@ class TransactionAggregator {
         }
     }
 
-    finalize() {
+    public finalize() {
         if (this.addresses.length > 0) {
             this.mintAggregated();
         }
@@ -79,7 +79,8 @@ class TransactionAggregator {
 
     private mintAggregated() {
         const totalAmount = this.amounts.reduce((a: BigNumber, b: BigNumber) => a.add(b), new BigNumber(0));
-        console.log(`Sending minting transaction for ${this.addresses.length} addresses of total ${fromPht(totalAmount).toFixed()} PHT`);
+        console.log(`Sending minting transaction for ${this.addresses.length} addresses ` +
+                    `of total ${fromPht(totalAmount).toFixed()} PHT`);
 
         this.txs.push(this.token.mintMany(this.addresses, this.amounts, { from: this.owner }));
 
