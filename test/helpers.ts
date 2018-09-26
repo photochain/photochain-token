@@ -29,6 +29,10 @@ export function toPht(num: AnyNumber) {
     return shiftNumber(num, PHT_DECIMALS);
 }
 
+export function fromPht(num: AnyNumber) {
+    return shiftNumber(num, -PHT_DECIMALS);
+}
+
 export function shiftNumber(num: AnyNumber, decimals: number): BigNumber {
     const factor = new BigNumber(10).pow(decimals);
     return new BigNumber(num).mul(factor);

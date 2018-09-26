@@ -11,6 +11,10 @@
         "test:truffle": "truffle test --contracts_build_directory .cache/contracts",
         "migrate:rinkeby": "run-s compile:ts migrate:rinkeby:js",
         "migrate:rinkeby:js": "truffle migrate --network rinkeby",
+        "distribute:rinkeby": "run-s compile:ts distribute:rinkeby:js",
+        "distribute:rinkeby:js": "truffle exec --network rinkeby scripts/distribute.js",
+        "develop": "run-s compile develop:js",
+        "develop:js": "truffle develop",
         "lint": "run-p -c --aggregate-output lint:solhint lint:solium lint:tslint",
         "lint:tslint": "tslint --project .",
         "lint:tslint:fix": "tslint --fix --project .",
@@ -52,5 +56,8 @@
         "truffle": "^4.1.14",
         "tslint": "^5.11.0",
         "typescript": "^3.0.3"
+    },
+    "dependencies": {
+        "csv-parse": "^3.0.0"
     }
 }
