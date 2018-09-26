@@ -44,7 +44,7 @@ contract('PhotochainToken', accounts => {
         });
 
         it('should set maximumSupply', async () => {
-            assertPhtEqual(await token.maximumSupply(), toPht(230_000_000));
+            assertPhtEqual(await token.maximumSupply(), toPht(120_000_000));
         });
 
         it('should be minting', async () => {
