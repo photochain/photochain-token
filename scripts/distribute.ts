@@ -58,6 +58,7 @@ async function distribute(data: DataRow[]) {
 
             const vesting = await deployVestingContract(token, row.beneficiary, row.vestingDays);
             aggr.queue(vesting.address, row.amount);
+            console.log();
         } else {
             aggr.queue(row.beneficiary, row.amount);
         }
