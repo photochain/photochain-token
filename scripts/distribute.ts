@@ -26,8 +26,11 @@ interface DataRow {
 
 async function asyncExec() {
     const data: DataRow[] = [];
+    const path = join(__dirname, 'phtdistribution.csv');
 
-    await createReadStream(join(__dirname, 'phtdistribution.csv'))
+    console.log(`Reading data from ${path}`);
+
+    await createReadStream(path)
         .pipe(parse({ delimiter: ',', from: 2 }))
         .on('data', row => {
             const beneficiary = row[0];
