@@ -61,7 +61,7 @@ contract StandardToken is ERC20 {
         public
         onlyValidAddress(to)
         onlySufficientBalance(from, value)
-        onlySufficientAllowance(from, to, value)
+        onlySufficientAllowance(from, msg.sender, value)
         returns (bool)
     {
         _balanceOf[from] = _balanceOf[from].sub(value);
@@ -83,7 +83,11 @@ contract StandardToken is ERC20 {
      * @param spender The address which will spend the funds.
      * @param value The amount of tokens to be spent.
      */
-    function approve(address spender, uint256 value) public returns (bool) {
+    function approve(address spender, uint256 value)
+        public
+        onlyValidAddress(spender)
+        returns (bool)
+    {
         _allowance[msg.sender][spender] = value;
 
         emit Approval(msg.sender, spender, value);
@@ -100,7 +104,11 @@ contract StandardToken is ERC20 {
      * @param spender The address which will spend the funds.
      * @param addedValue The amount of tokens to increase the allowance by.
      */
-    function increaseApproval(address spender, uint addedValue) public returns (bool) {
+    function increaseAllowance(address spender, uint addedValue)
+        public
+        onlyValidAddress(spender)
+        returns (bool)
+    {
         _allowance[msg.sender][spender] = _allowance[msg.sender][spender].add(addedValue);
 
         emit Approval(msg.sender, spender, _allowance[msg.sender][spender]);
@@ -117,7 +125,11 @@ contract StandardToken is ERC20 {
      * @param spender The address which will spend the funds.
      * @param subtractedValue The amount of tokens to decrease the allowance by.
      */
-    function decreaseApproval(address spender, uint subtractedValue) public returns (bool) {
+    function decreaseAllowance(address spender, uint subtractedValue)
+        public
+        onlyValidAddress(spender)
+        returns (bool)
+    {
         uint oldValue = _allowance[msg.sender][spender];
         if (subtractedValue > oldValue) {
             _allowance[msg.sender][spender] = 0;
