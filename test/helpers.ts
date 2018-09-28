@@ -7,6 +7,7 @@ import { AnyNumber } from 'web3';
 import * as Web3 from 'web3';
 
 export const PHT_DECIMALS = 18;
+export const ZERO_ADDRESS = `0x${'0'.repeat(40)}`;
 
 export function assertNumberEqual(actual: AnyNumber, expect: AnyNumber, decimals: number = 0) {
     const actualNum = new BigNumber(actual);

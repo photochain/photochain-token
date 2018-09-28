@@ -29,6 +29,12 @@ declare module 'photochain' {
             value: BigNumber;
         }
 
+        interface ApprovalEvent {
+            owner: Address;
+            spender: Address;
+            value: BigNumber;
+        }
+
         interface ERC20 extends ContractBase {
             totalSupply(): Promise<BigNumber>;
             balanceOf(who: Address): Promise<BigNumber>;

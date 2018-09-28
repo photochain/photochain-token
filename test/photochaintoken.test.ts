@@ -1,10 +1,25 @@
 import { BigNumber } from 'bignumber.js';
 import { assert } from 'chai';
-import { MintEvent, MintFinishedEvent, PhotochainArtifacts, PhotochainToken, TransferEvent } from 'photochain';
+import {
+    ApprovalEvent,
+    MintEvent,
+    MintFinishedEvent,
+    PhotochainArtifacts,
+    PhotochainToken,
+    TransferEvent
+} from 'photochain';
 import { ContractContextDefinition } from 'truffle';
 import * as Web3 from 'web3';
 
-import { assertNumberEqual, assertPhtEqual, assertReverts, findLastLog, PHT_DECIMALS, toPht } from './helpers';
+import {
+    assertNumberEqual,
+    assertPhtEqual,
+    assertReverts,
+    findLastLog,
+    PHT_DECIMALS,
+    toPht,
+    ZERO_ADDRESS
+} from './helpers';
 
 declare const web3: Web3;
 declare const artifacts: PhotochainArtifacts;
@@ -15,14 +30,15 @@ const PhotochainToken = artifacts.require('./PhotochainToken.sol');
 contract('PhotochainToken', accounts => {
     const owner = accounts[0];
     const nonOwner = accounts[2];
+    const defaultAmount = toPht(100);
+
+    let token: PhotochainToken;
+
+    beforeEach(async () => {
+        token = await PhotochainToken.new();
+    });
 
     describe('Constructor', () => {
-        let token: PhotochainToken;
-
-        beforeEach(async () => {
-            token = await PhotochainToken.deployed();
-        });
-
         it('should set name', async () => {
             assert.equal(await token.name(), 'PhotochainToken');
         });
@@ -52,14 +68,87 @@ contract('PhotochainToken', accounts => {
         });
     });
 
+    describe('Function transfer', () => {
+        it('should transfer requested amount', async () => {
+            await token.mint(owner, defaultAmount);
+
+            const prevOwnerBalance = await token.balanceOf(owner);
+            const prevNonOwnerBalance = await token.balanceOf(nonOwner);
+
+            await token.transfer(nonOwner, defaultAmount);
+
+            const ownerBalance = await token.balanceOf(owner);
+            const nonOwnerBalance = await token.balanceOf(nonOwner);
+
+            assertPhtEqual(ownerBalance, prevOwnerBalance.sub(defaultAmount));
+            assertPhtEqual(nonOwnerBalance, prevNonOwnerBalance.add(defaultAmount));
+        });
+
+        it('should emit Transfer event', async () => {
+            await token.mint(owner, defaultAmount);
+
+            const tx = await token.transfer(nonOwner, defaultAmount);
+
+            const log = findLastLog(tx, 'Transfer');
+            assert.isOk(log);
+
+            const event = log.args as TransferEvent;
+            assert.isOk(event);
+            assert.equal(event.from, owner);
+            assert.equal(event.to, nonOwner);
+            assertPhtEqual(event.value, defaultAmount);
+        });
+
+        it('should revert when recipient is zero address', async () => {
+            await token.mint(owner, toPht(100));
+            await assertReverts(async () => {
+                await token.transfer(ZERO_ADDRESS, toPht(100));
+            });
+        });
+
+        it('should revert when sender has not enough balance', async () => {
+            const tooMuch = (await token.balanceOf(owner)).add(1);
+            await assertReverts(async () => {
+                await token.transfer(nonOwner, tooMuch);
+            });
+        });
+    });
+
+    describe('Function approve', () => {
+        it('should set allowance', async () => {
+            await token.approve(nonOwner, defaultAmount);
+            assertPhtEqual(await token.allowance(owner, nonOwner), defaultAmount);
+        });
+
+        it('should override previous allowance', async () => {
+            await token.approve(nonOwner, defaultAmount);
+            await token.approve(nonOwner, defaultAmount.mul(3));
+            assertPhtEqual(await token.allowance(owner, nonOwner), defaultAmount.mul(3));
+        });
+
+        it('should emit Approval event', async () => {
+            const tx = await token.approve(nonOwner, defaultAmount);
+
+            const log = findLastLog(tx, 'Approval');
+            assert.isOk(log);
+
+            const event = log.args as ApprovalEvent;
+            assert.isOk(event);
+            assert.equal(event.owner, owner);
+            assert.equal(event.spender, nonOwner);
+            assertPhtEqual(event.value, defaultAmount);
+        });
+
+        it('should revert when spender is zero address', async () => {
+            await token.mint(owner, toPht(100));
+            await assertReverts(async () => {
+                await token.transfer(ZERO_ADDRESS, toPht(100));
+            });
+        });
+    });
+
     describe('Function mint', () => {
         const defaultBeneficiary = accounts[1];
-        const defaultAmount = toPht(100);
-        let token: PhotochainToken;
-
-        beforeEach(async () => {
-            token = await PhotochainToken.new();
-        });
 
         it('should increase totalSupply', async () => {
             const prevSupply = await token.totalSupply();
@@ -129,12 +218,6 @@ contract('PhotochainToken', accounts => {
         const defaultBeneficiaries = accounts.slice(1, 5);
         const defaultAmounts = [toPht(100), toPht(150), toPht(50), toPht(200)];
         const defaultTotalAmount = defaultAmounts.reduce((a: BigNumber, b: BigNumber) => a.add(b), new BigNumber(0));
-
-        let token: PhotochainToken;
-
-        beforeEach(async () => {
-            token = await PhotochainToken.new();
-        });
 
         it('should increase totalSupply', async () => {
             const prevSupply = await token.totalSupply();
@@ -234,12 +317,6 @@ contract('PhotochainToken', accounts => {
     });
 
     describe('Function finishMinting', () => {
-        let token: PhotochainToken;
-
-        beforeEach(async () => {
-            token = await PhotochainToken.new();
-        });
-
         it('should set mintingFinished', async () => {
             assert.isFalse(await token.mintingFinished());
             await token.finishMinting();
