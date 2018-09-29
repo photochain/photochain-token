@@ -80,6 +80,9 @@ declare module 'photochain' {
             symbol(): Promise<string>;
             decimals(): Promise<BigNumber>;
             maximumSupply(): Promise<BigNumber>;
+
+            increaseAllowance(spender: Address, subtractedValue: AnyNumber): Promise<TransactionResult>;
+            decreaseAllowance(spender: Address, subtractedValue: AnyNumber): Promise<TransactionResult>;
         }
 
         interface PhotochainVesting extends ContractBase {

@@ -27,8 +27,8 @@ contract StandardToken is ERC20 {
         _;
     }
 
-    modifier onlySufficientAllowance(address from, address to, uint256 value) {
-        require(value <= _allowance[from][to], "Insufficient allowance");
+    modifier onlySufficientAllowance(address owner, address spender, uint256 value) {
+        require(value <= _allowance[owner][spender], "Insufficient allowance");
         _;
     }
 
@@ -104,7 +104,7 @@ contract StandardToken is ERC20 {
      * @param spender The address which will spend the funds.
      * @param addedValue The amount of tokens to increase the allowance by.
      */
-    function increaseAllowance(address spender, uint addedValue)
+    function increaseAllowance(address spender, uint256 addedValue)
         public
         onlyValidAddress(spender)
         returns (bool)
@@ -125,17 +125,13 @@ contract StandardToken is ERC20 {
      * @param spender The address which will spend the funds.
      * @param subtractedValue The amount of tokens to decrease the allowance by.
      */
-    function decreaseAllowance(address spender, uint subtractedValue)
+    function decreaseAllowance(address spender, uint256 subtractedValue)
         public
         onlyValidAddress(spender)
+        onlySufficientAllowance(msg.sender, spender, subtractedValue)
         returns (bool)
     {
-        uint oldValue = _allowance[msg.sender][spender];
-        if (subtractedValue > oldValue) {
-            _allowance[msg.sender][spender] = 0;
-        } else {
-            _allowance[msg.sender][spender] = oldValue.sub(subtractedValue);
-        }
+        _allowance[msg.sender][spender] = _allowance[msg.sender][spender].sub(subtractedValue);
 
         emit Approval(msg.sender, spender, _allowance[msg.sender][spender]);
 
