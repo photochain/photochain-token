@@ -283,6 +283,43 @@ contract('PhotochainToken', accounts => {
         });
     });
 
+    describe('Function increaseAllowance', () => {
+        const defaultSpender = accounts[1];
+
+        it('should increase the spender allowance', async () => {
+            await token.approve(defaultSpender, defaultAmount);
+            await token.increaseAllowance(defaultSpender, 1);
+
+            assertPhtEqual(await token.allowance(owner, defaultSpender), defaultAmount.add(1));
+        });
+
+        it('should increase the spender allowance from zero', async () => {
+            await token.increaseAllowance(defaultSpender, defaultAmount);
+
+            assertPhtEqual(await token.allowance(owner, defaultSpender), defaultAmount);
+        });
+
+        it('should emit Approval event', async () => {
+            await token.approve(defaultSpender, defaultAmount);
+            const tx = await token.increaseAllowance(defaultSpender, 1);
+
+            const log = findLastLog(tx, 'Approval');
+            assert.isOk(log);
+
+            const event = log.args as ApprovalEvent;
+            assert.isOk(event);
+            assert.equal(event.owner, owner);
+            assert.equal(event.spender, defaultSpender);
+            assertPhtEqual(event.value, defaultAmount.add(1));
+        });
+
+        it('should revert spender is zero address', async () => {
+            await assertReverts(async () => {
+                await token.increaseAllowance(ZERO_ADDRESS, 1);
+            });
+        });
+    });
+
     describe('Function mint', () => {
         const defaultBeneficiary = accounts[1];
 
