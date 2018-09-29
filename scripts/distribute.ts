@@ -87,19 +87,20 @@ async function distributeNotVesting(data: DataRow[], stats: Statistics) {
 
 async function distributeVesting(data: DataRow[], stats: Statistics) {
     const token = await PhotochainToken.deployed();
+    const owner = await token.owner();
 
     for (const row of data) {
         console.log(`Address ${row.beneficiary} under vesting period of ${row.vestingDays} days`);
 
         const releaseTime = calculateTimestampFromDays(row.vestingDays);
-        const vesting = await PhotochainVesting.new(token.address, row.beneficiary, releaseTime);
+        const vesting = await PhotochainVesting.new(token.address, row.beneficiary, releaseTime, { from: owner });
 
         console.log(
             `Deployed vesting contract at ${vesting.address} for ` +
                 `address ${row.beneficiary} until ${new Date(releaseTime * 1000)}`
         );
 
-        const tx = await token.mint(vesting.address, row.amount);
+        const tx = await token.mint(vesting.address, row.amount, { from: owner });
         console.log(
             `Minted ${fromPht(row.amount).toFixed()} PHT for ${vesting.address}: ${tx.receipt.transactionHash}\n`
         );
