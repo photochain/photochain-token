@@ -12,7 +12,7 @@ declare const contract: ContractContextDefinition;
 const PhotochainToken = artifacts.require('./PhotochainToken.sol');
 const PhotochainVesting = artifacts.require('./PhotochainVesting.sol');
 
-contract('PhotochainToken', accounts => {
+contract('PhotochainVesting', accounts => {
     const defaultBeneficiary = accounts[2];
     const defaultReleaseTime = calculateTimestampFromDays(90);
 

@@ -29,7 +29,7 @@ const PhotochainToken = artifacts.require('./PhotochainToken.sol');
 
 contract('PhotochainToken', accounts => {
     const owner = accounts[0];
-    const nonOwner = accounts[2];
+    const nonOwner = accounts[9];
     const defaultAmount = toPht(100);
 
     let token: PhotochainToken;
@@ -69,25 +69,27 @@ contract('PhotochainToken', accounts => {
     });
 
     describe('Function transfer', () => {
+        const defaultRecipient = accounts[1];
+
         it('should transfer requested amount', async () => {
             await token.mint(owner, defaultAmount);
 
             const prevOwnerBalance = await token.balanceOf(owner);
-            const prevNonOwnerBalance = await token.balanceOf(nonOwner);
+            const prevRecipientBalance = await token.balanceOf(defaultRecipient);
 
-            await token.transfer(nonOwner, defaultAmount);
+            await token.transfer(defaultRecipient, defaultAmount);
 
             const ownerBalance = await token.balanceOf(owner);
-            const nonOwnerBalance = await token.balanceOf(nonOwner);
+            const recipientBalance = await token.balanceOf(defaultRecipient);
 
             assertPhtEqual(ownerBalance, prevOwnerBalance.sub(defaultAmount));
-            assertPhtEqual(nonOwnerBalance, prevNonOwnerBalance.add(defaultAmount));
+            assertPhtEqual(recipientBalance, prevRecipientBalance.add(defaultAmount));
         });
 
         it('should emit Transfer event', async () => {
             await token.mint(owner, defaultAmount);
 
-            const tx = await token.transfer(nonOwner, defaultAmount);
+            const tx = await token.transfer(defaultRecipient, defaultAmount);
 
             const log = findLastLog(tx, 'Transfer');
             assert.isOk(log);
@@ -95,39 +97,41 @@ contract('PhotochainToken', accounts => {
             const event = log.args as TransferEvent;
             assert.isOk(event);
             assert.equal(event.from, owner);
-            assert.equal(event.to, nonOwner);
+            assert.equal(event.to, defaultRecipient);
             assertPhtEqual(event.value, defaultAmount);
         });
 
         it('should revert when recipient is zero address', async () => {
-            await token.mint(owner, toPht(100));
+            await token.mint(owner, defaultAmount);
             await assertReverts(async () => {
-                await token.transfer(ZERO_ADDRESS, toPht(100));
+                await token.transfer(ZERO_ADDRESS, defaultAmount);
             });
         });
 
         it('should revert when sender has not enough balance', async () => {
             const tooMuch = (await token.balanceOf(owner)).add(1);
             await assertReverts(async () => {
-                await token.transfer(nonOwner, tooMuch);
+                await token.transfer(defaultRecipient, tooMuch);
             });
         });
     });
 
     describe('Function approve', () => {
+        const defaultSpender = accounts[1];
+
         it('should set allowance', async () => {
-            await token.approve(nonOwner, defaultAmount);
-            assertPhtEqual(await token.allowance(owner, nonOwner), defaultAmount);
+            await token.approve(defaultSpender, defaultAmount);
+            assertPhtEqual(await token.allowance(owner, defaultSpender), defaultAmount);
         });
 
         it('should override previous allowance', async () => {
-            await token.approve(nonOwner, defaultAmount);
-            await token.approve(nonOwner, defaultAmount.mul(3));
-            assertPhtEqual(await token.allowance(owner, nonOwner), defaultAmount.mul(3));
+            await token.approve(defaultSpender, defaultAmount);
+            await token.approve(defaultSpender, defaultAmount.mul(3));
+            assertPhtEqual(await token.allowance(owner, defaultSpender), defaultAmount.mul(3));
         });
 
         it('should emit Approval event', async () => {
-            const tx = await token.approve(nonOwner, defaultAmount);
+            const tx = await token.approve(defaultSpender, defaultAmount);
 
             const log = findLastLog(tx, 'Approval');
             assert.isOk(log);
@@ -135,14 +139,94 @@ contract('PhotochainToken', accounts => {
             const event = log.args as ApprovalEvent;
             assert.isOk(event);
             assert.equal(event.owner, owner);
-            assert.equal(event.spender, nonOwner);
+            assert.equal(event.spender, defaultSpender);
             assertPhtEqual(event.value, defaultAmount);
         });
 
         it('should revert when spender is zero address', async () => {
-            await token.mint(owner, toPht(100));
+            await token.mint(owner, defaultAmount);
             await assertReverts(async () => {
-                await token.transfer(ZERO_ADDRESS, toPht(100));
+                await token.transfer(ZERO_ADDRESS, defaultAmount);
+            });
+        });
+    });
+
+    describe('Function transferFrom', () => {
+        const defaultSpender = accounts[1];
+        const defaultRecipient = accounts[2];
+
+        it('should transfer the requested amount', async () => {
+            await token.mint(owner, defaultAmount);
+            await token.approve(defaultSpender, defaultAmount);
+
+            const prevOwnerBalance = await token.balanceOf(owner);
+            const prevRecipientBalance = await token.balanceOf(defaultRecipient);
+
+            await token.transferFrom(owner, defaultRecipient, defaultAmount, { from: defaultSpender });
+
+            const ownerBalance = await token.balanceOf(owner);
+            const recipientBalance = await token.balanceOf(defaultRecipient);
+
+            assertPhtEqual(await token.balanceOf(owner), prevOwnerBalance.sub(defaultAmount));
+            assertPhtEqual(await token.balanceOf(defaultRecipient), prevRecipientBalance.add(defaultAmount));
+        });
+
+        it('should decrease the spender allowance', async () => {
+            await token.mint(owner, defaultAmount);
+            await token.approve(defaultSpender, defaultAmount.mul(2));
+
+            const prevAllowance = await token.allowance(owner, defaultSpender);
+
+            await token.transferFrom(owner, defaultRecipient, defaultAmount, { from: defaultSpender });
+
+            assertPhtEqual(await token.allowance(owner, defaultSpender), prevAllowance.sub(defaultAmount));
+        });
+
+        it('should emit Transfer event', async () => {
+            await token.mint(owner, defaultAmount);
+            await token.approve(defaultSpender, defaultAmount);
+
+            const tx = await token.transferFrom(owner, defaultRecipient, defaultAmount, { from: defaultSpender });
+
+            const log = findLastLog(tx, 'Transfer');
+            assert.isOk(log);
+
+            const event = log.args as TransferEvent;
+            assert.isOk(event);
+            assert.equal(event.from, owner);
+            assert.equal(event.to, defaultRecipient);
+            assertPhtEqual(event.value, defaultAmount);
+        });
+
+        it('should revert when owner does not have enough balance', async () => {
+            await token.mint(owner, defaultAmount);
+
+            const ownerBalance = await token.balanceOf(owner);
+            const tooMuch = ownerBalance.add(1);
+            await token.approve(defaultSpender, tooMuch);
+
+            await assertReverts(async () => {
+                await token.transferFrom(owner, defaultRecipient, tooMuch, { from: defaultSpender });
+            });
+        });
+
+        it('should revert when spender does not have enough allowance', async () => {
+            await token.mint(owner, defaultAmount.mul(3));
+            await token.approve(defaultSpender, defaultAmount);
+
+            const tooMuch = (await token.allowance(owner, defaultSpender)).add(1);
+
+            await assertReverts(async () => {
+                await token.transferFrom(owner, defaultRecipient, tooMuch, { from: defaultSpender });
+            });
+        });
+
+        it('should revert when recipient is zero address', async () => {
+            await token.mint(owner, defaultAmount);
+            await token.approve(defaultSpender, defaultAmount);
+
+            await assertReverts(async () => {
+                await token.transferFrom(owner, ZERO_ADDRESS, defaultAmount, { from: defaultSpender });
             });
         });
     });
@@ -279,7 +363,7 @@ contract('PhotochainToken', accounts => {
                         .concat(i.toString())
                         .slice(-40)}`
                 );
-                amounts.push(toPht(100));
+                amounts.push(defaultAmount);
             }
             const totalAmount = amounts.reduce((a: BigNumber, b: BigNumber) => a.add(b), new BigNumber(0));
 
