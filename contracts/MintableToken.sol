@@ -11,7 +11,7 @@ import "./Ownable.sol";
  */
 contract MintableToken is StandardToken, Ownable {
     bool public mintingFinished;
-    uint256 public maximumSupply;
+    uint256 public cap;
 
     event Mint(address indexed to, uint256 amount);
     event MintFinished();
@@ -21,13 +21,13 @@ contract MintableToken is StandardToken, Ownable {
         _;
     }
 
-    modifier onlyNotExceedingMaximumSupply(uint256 amount) {
-        require(_totalSupply.add(amount) <= maximumSupply, "Total supply must not exceed maximum supply");
+    modifier onlyNotExceedingCap(uint256 amount) {
+        require(_totalSupply.add(amount) <= cap, "Total supply must not exceed cap");
         _;
     }
 
-    constructor(uint256 _maximumSupply) public {
-        maximumSupply = _maximumSupply;
+    constructor(uint256 _cap) public {
+        cap = _cap;
     }
 
     /**
@@ -41,7 +41,7 @@ contract MintableToken is StandardToken, Ownable {
         onlyOwner
         onlyMinting
         onlyValidAddress(to)
-        onlyNotExceedingMaximumSupply(amount)
+        onlyNotExceedingCap(amount)
         returns (bool)
     {
         mintImpl(to, amount);
@@ -59,7 +59,7 @@ contract MintableToken is StandardToken, Ownable {
         public
         onlyOwner
         onlyMinting
-        onlyNotExceedingMaximumSupply(sum(amounts))
+        onlyNotExceedingCap(sum(amounts))
         returns (bool)
     {
         require(

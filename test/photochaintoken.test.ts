@@ -59,8 +59,8 @@ contract('PhotochainToken', accounts => {
             assert.equal(await token.owner(), accounts[0]);
         });
 
-        it('should set maximumSupply', async () => {
-            assertPhtEqual(await token.maximumSupply(), toPht(120_000_000));
+        it('should set cap', async () => {
+            assertPhtEqual(await token.cap(), toPht(120_000_000));
         });
 
         it('should be minting', async () => {
@@ -378,11 +378,11 @@ contract('PhotochainToken', accounts => {
             });
         });
 
-        it('should revert when exceeds maximumSupply', async () => {
-            const maximumSupply = await token.maximumSupply();
+        it('should revert when exceeds cap', async () => {
+            const cap = await token.cap();
 
             await assertReverts(async () => {
-                await token.mint(defaultBeneficiary, maximumSupply.add(1));
+                await token.mint(defaultBeneficiary, cap.add(1));
             });
         });
     });
@@ -478,9 +478,9 @@ contract('PhotochainToken', accounts => {
             });
         });
 
-        it('should revert when exceeds maximumSupply', async () => {
-            const maximumSupply = await token.maximumSupply();
-            const exceedingAmounts = [maximumSupply.div(2), maximumSupply.div(2).add(1)];
+        it('should revert when exceeds cap', async () => {
+            const cap = await token.cap();
+            const exceedingAmounts = [cap.div(2), cap.div(2).add(1)];
             const exceedingBeneficiaries = accounts.slice(0, 2);
 
             await assertReverts(async () => {

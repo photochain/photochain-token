@@ -23,7 +23,7 @@ The token extends the ERC20 interface in a backward compatible way with features
 essential for crowdsale distribution, like:
 - minting tokens for specified addresses by an authorized party,
 - finishing minting and preventing future inflation of supply,
-- hard cap, limiting total supply to the maximum of 230 mln PHT tokens created
+- hard cap, limiting total supply to the maximum of 120 mln PHT tokens created
   in the process of minting
 
 Only sold and allocated tokens are minted, there is no need to burn unsold
@@ -56,9 +56,9 @@ function will revert when called.
 Minting is possible only by the owner of the contract. By default, it is the
 deploying address, but can be changed later.
 
-The hard cap serves as additional protection against exceeding the maximum
-supply of 230 mln PHT. Total supply can be lower because only sold and allocated
-tokens are minted.
+The hard cap serves as additional protection against exceeding the supply of 120
+mln PHT. Total supply can be lower because only sold and allocated tokens are
+minted.
 
 ## Distribution process
 

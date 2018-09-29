@@ -79,7 +79,7 @@ declare module 'photochain' {
             name(): Promise<string>;
             symbol(): Promise<string>;
             decimals(): Promise<BigNumber>;
-            maximumSupply(): Promise<BigNumber>;
+            cap(): Promise<BigNumber>;
 
             increaseAllowance(spender: Address, subtractedValue: AnyNumber): Promise<TransactionResult>;
             decreaseAllowance(spender: Address, subtractedValue: AnyNumber): Promise<TransactionResult>;
