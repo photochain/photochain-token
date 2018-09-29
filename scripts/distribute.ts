@@ -18,9 +18,15 @@ declare const web3: Web3;
 const PhotochainToken = artifacts.require('./contracts/PhotochainToken.sol');
 const PhotochainVesting = artifacts.require('./contracts/PhotochainVesting.sol');
 
+interface Statistics {
+    totalNonVestingAddresses: number;
+    totalTokens: BigNumber;
+    totalVestingAddresses: number;
+}
+
 interface DataRow {
-    beneficiary: Address;
     amount: BigNumber;
+    beneficiary: Address;
     vestingDays: number;
 }
 
@@ -48,84 +54,98 @@ function exec(finalize: ScriptFinalizer) {
 }
 
 async function distribute(data: DataRow[]) {
+    const stats: Statistics = {
+        totalNonVestingAddresses: 0,
+        totalTokens: new BigNumber(0),
+        totalVestingAddresses: 0
+    };
+
+    try {
+        await distributeNotVesting(data.filter(row => row.vestingDays === 0), stats);
+        await distributeVesting(data.filter(row => row.vestingDays > 0), stats);
+    } finally {
+        console.log(`Total minted tokens: ${fromPht(stats.totalTokens).toFixed()} PHT`);
+        console.log(`Total number of holders: ${stats.totalVestingAddresses + stats.totalNonVestingAddresses}`);
+        console.log(`Total number of addressess without vesting period: ${stats.totalNonVestingAddresses}`);
+        console.log(`Total number of addressess under vesting period: ${stats.totalVestingAddresses}`);
+    }
+}
+
+async function distributeNotVesting(data: DataRow[], stats: Statistics) {
     const token = await PhotochainToken.deployed();
     const owner = await token.owner();
     const aggr = new TransactionAggregator(token, owner);
 
     for (const row of data) {
-        if (row.vestingDays > 0) {
-            console.log(`Address ${row.beneficiary} under vesting period of ${row.vestingDays} days`);
+        await aggr.queue(row.beneficiary, row.amount);
 
-            const vesting = await deployVestingContract(token, row.beneficiary, row.vestingDays);
-            aggr.queue(vesting.address, row.amount);
-            console.log();
-        } else {
-            aggr.queue(row.beneficiary, row.amount);
-        }
+        stats.totalNonVestingAddresses++;
+        stats.totalTokens = stats.totalTokens.add(row.amount);
     }
-
-    const results = await aggr.finalize();
-    console.log('Finished with mintMany transactions:\n' + results.map(tx => tx.receipt.transactionHash).join('\n'));
+    await aggr.finalize();
 }
 
-async function deployVestingContract(token: PhotochainToken, beneficiary: Address, vestingDays: number) {
-    const releaseTime = calculateTimestampFromDays(vestingDays);
-    const vesting = await PhotochainVesting.new(token.address, beneficiary, releaseTime);
-    console.log(
-        `Deployed vesting contract at ${vesting.address} for ` +
-            `address ${beneficiary} until ${new Date(releaseTime * 1000)}`
-    );
-    return vesting;
+async function distributeVesting(data: DataRow[], stats: Statistics) {
+    const token = await PhotochainToken.deployed();
+
+    for (const row of data) {
+        console.log(`Address ${row.beneficiary} under vesting period of ${row.vestingDays} days`);
+
+        const releaseTime = calculateTimestampFromDays(row.vestingDays);
+        const vesting = await PhotochainVesting.new(token.address, row.beneficiary, releaseTime);
+
+        console.log(
+            `Deployed vesting contract at ${vesting.address} for ` +
+                `address ${row.beneficiary} until ${new Date(releaseTime * 1000)}`
+        );
+
+        const tx = await token.mint(vesting.address, row.amount);
+        console.log(
+            `Minted ${fromPht(row.amount).toFixed()} PHT for ${vesting.address}: ${tx.receipt.transactionHash}\n`
+        );
+
+        stats.totalVestingAddresses++;
+        stats.totalTokens = stats.totalTokens.add(row.amount);
+    }
 }
 
 class TransactionAggregator {
     private static readonly MAX = 168;
 
-    private txs: Array<Promise<TransactionResult>> = [];
     private addresses: Address[] = [];
     private amounts: BigNumber[] = [];
-    private totalAddresses = 0;
-    private totalAmount = new BigNumber(0);
 
     constructor(private token: PhotochainToken, private owner: string) {}
 
-    public queue(beneficiary: Address, amount: BigNumber) {
+    public async queue(beneficiary: Address, amount: BigNumber) {
         console.log(`Queuing minting of ${fromPht(amount).toFixed()} PHT for ${beneficiary}`);
 
         this.addresses.push(beneficiary);
         this.amounts.push(amount);
 
         if (this.addresses.length >= TransactionAggregator.MAX) {
-            this.mintAggregated();
+            await this.mintAggregated();
         }
     }
 
-    public finalize() {
+    public async finalize() {
         if (this.addresses.length > 0) {
-            this.mintAggregated();
+            await this.mintAggregated();
         }
-
-        console.log(
-            `Finalizing distribution of ${fromPht(this.totalAmount).toFixed()} PHT ` +
-                `to ${this.totalAddresses} addresses`
-        );
-        console.log(`Waiting for ${this.txs.length} transactions...`);
-        return Promise.all(this.txs);
     }
 
-    private mintAggregated() {
+    private async mintAggregated() {
         const aggregatedAmount = this.amounts.reduce((a: BigNumber, b: BigNumber) => a.add(b), new BigNumber(0));
         console.log(
             `Sending minting transaction for ${this.addresses.length} addresses ` +
                 `of total ${fromPht(aggregatedAmount).toFixed()} PHT`
         );
 
-        this.txs.push(this.token.mintMany(this.addresses, this.amounts, { from: this.owner }));
+        const tx = await this.token.mintMany(this.addresses, this.amounts, { from: this.owner });
 
-        this.totalAddresses += this.addresses.length;
+        console.log(`Minted ${fromPht(aggregatedAmount).toFixed()} PHT: ${tx.receipt.transactionHash}`);
+
         this.addresses = [];
-
-        this.totalAmount = this.totalAmount.add(aggregatedAmount);
         this.amounts = [];
     }
 }
