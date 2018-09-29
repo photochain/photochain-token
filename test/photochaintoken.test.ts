@@ -439,8 +439,8 @@ contract('PhotochainToken', accounts => {
             }
         });
 
-        const maxMintMany = 200;
-        it(`should accept ${maxMintMany} beneficiaries at once`, async () => {
+        const maxMintMany = 168;
+        it(`should accept ${maxMintMany} beneficiaries at once and keep gas usage under 5.3 mln`, async () => {
             const prevSupply = await token.totalSupply();
 
             const beneficiaries = [];
@@ -456,7 +456,9 @@ contract('PhotochainToken', accounts => {
             }
             const totalAmount = amounts.reduce((a: BigNumber, b: BigNumber) => a.add(b), new BigNumber(0));
 
-            await token.mintMany(beneficiaries, amounts);
+            const tx = await token.mintMany(beneficiaries, amounts);
+
+            assert.isBelow(tx.receipt.gasUsed, 5_300_000);
 
             // check total supply change to confirm the transaction has succeeded
             assertPhtEqual(await token.totalSupply(), prevSupply.add(totalAmount));

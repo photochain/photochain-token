@@ -79,7 +79,7 @@ async function deployVestingContract(token: PhotochainToken, beneficiary: Addres
 }
 
 class TransactionAggregator {
-    private static readonly MAX_MINT_MANY = 200;
+    private static readonly MAX = 168;
 
     private txs: Array<Promise<TransactionResult>> = [];
     private addresses: Address[] = [];
@@ -95,7 +95,7 @@ class TransactionAggregator {
         this.addresses.push(beneficiary);
         this.amounts.push(amount);
 
-        if (this.addresses.length >= TransactionAggregator.MAX_MINT_MANY) {
+        if (this.addresses.length >= TransactionAggregator.MAX) {
             this.mintAggregated();
         }
     }
