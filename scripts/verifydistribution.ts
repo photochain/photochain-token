@@ -62,9 +62,9 @@ async function asyncExec() {
 }
 
 async function readDistribution(path: string) {
-    const distribution: Array<DistributionRecord> = [];
+    const distribution: DistributionRecord[] = [];
 
-    return new Promise<Array<DistributionRecord>>((resolve, reject) => {
+    return new Promise<DistributionRecord[]>((resolve, reject) => {
         createReadStream(path)
             .pipe(parse({ delimiter: ',', from: 2 }))
             .on('data', row => {
@@ -80,8 +80,8 @@ async function readDistribution(path: string) {
     });
 }
 
-function normalizeDistribution(distribution: Array<DistributionRecord>) {
-    const normalized: Array<DistributionRecord> = [];
+function normalizeDistribution(distribution: DistributionRecord[]) {
+    const normalized: DistributionRecord[] = [];
 
     const aggr: { [key: string]: BigNumber } = {};
     for (const row of distribution) {
@@ -98,8 +98,8 @@ function normalizeDistribution(distribution: Array<DistributionRecord>) {
 
     for (const beneficiary of Object.keys(aggr)) {
         normalized.push({
-            beneficiary,
             amount: aggr[beneficiary],
+            beneficiary,
             vestingDays: 0
         });
     }

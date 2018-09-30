@@ -24,36 +24,15 @@ interface Statistics {
     totalVestingAddresses: number;
 }
 
-interface DataRow {
+interface DistributionRecord {
     amount: BigNumber;
     beneficiary: Address;
     vestingDays: number;
 }
 
 async function asyncExec() {
-    const data: DataRow[] = [];
-    const path = join(__dirname, 'phtdistribution.csv');
+    const distribution = await readDistribution(join(__dirname, 'phtdistribution.csv'));
 
-    console.log(`Reading data from ${path}`);
-
-    await createReadStream(path)
-        .pipe(parse({ delimiter: ',', from: 2 }))
-        .on('data', row => {
-            const beneficiary = row[0];
-            const amount = toPht(row[1]);
-            const vestingDays = Number(row[2]);
-            data.push({ beneficiary, amount, vestingDays });
-        })
-        .on('end', async () => {
-            await distribute(data);
-        });
-}
-
-function exec(finalize: ScriptFinalizer) {
-    asyncExec().then(() => finalize(), reason => finalize(reason));
-}
-
-async function distribute(data: DataRow[]) {
     const stats: Statistics = {
         totalNonVestingAddresses: 0,
         totalTokens: new BigNumber(0),
@@ -61,8 +40,8 @@ async function distribute(data: DataRow[]) {
     };
 
     try {
-        await distributeNotVesting(data.filter(row => row.vestingDays === 0), stats);
-        await distributeVesting(data.filter(row => row.vestingDays > 0), stats);
+        await distributeNotVesting(distribution.filter(row => row.vestingDays === 0), stats);
+        await distributeVesting(distribution.filter(row => row.vestingDays > 0), stats);
     } finally {
         console.log(`Total minted tokens: ${fromPht(stats.totalTokens).toFixed()} PHT`);
         console.log(`Total number of holders: ${stats.totalVestingAddresses + stats.totalNonVestingAddresses}`);
@@ -71,7 +50,26 @@ async function distribute(data: DataRow[]) {
     }
 }
 
-async function distributeNotVesting(data: DataRow[], stats: Statistics) {
+async function readDistribution(path: string) {
+    const distribution: DistributionRecord[] = [];
+
+    return new Promise<DistributionRecord[]>((resolve, reject) => {
+        createReadStream(path)
+            .pipe(parse({ delimiter: ',', from: 2 }))
+            .on('data', row => {
+                const beneficiary = row[0];
+                const amount = toPht(row[1]);
+                const vestingDays = Number(row[2]);
+                distribution.push({ beneficiary, amount, vestingDays });
+            })
+            .on('end', async () => {
+                resolve(distribution);
+            })
+            .on('error', reject);
+    });
+}
+
+async function distributeNotVesting(data: DistributionRecord[], stats: Statistics) {
     const token = await PhotochainToken.deployed();
     const owner = await token.owner();
     const aggr = new TransactionAggregator(token, owner);
@@ -85,7 +83,7 @@ async function distributeNotVesting(data: DataRow[], stats: Statistics) {
     await aggr.finalize();
 }
 
-async function distributeVesting(data: DataRow[], stats: Statistics) {
+async function distributeVesting(data: DistributionRecord[], stats: Statistics) {
     const token = await PhotochainToken.deployed();
     const owner = await token.owner();
 
@@ -149,6 +147,10 @@ class TransactionAggregator {
         this.addresses = [];
         this.amounts = [];
     }
+}
+
+function exec(finalize: ScriptFinalizer) {
+    asyncExec().then(() => finalize(), reason => finalize(reason));
 }
 
 export = exec;
